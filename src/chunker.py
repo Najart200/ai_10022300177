@@ -93,8 +93,19 @@ def sentence_chunk(text: str,
                 chunks.append(current)
             current = sent
 
-    if current and len(current) >= min_chars:
-        chunks.append(current)
+    if current:
+        if len(current) >= min_chars:
+            chunks.append(current)
+        elif not chunks:
+            # Whole document shorter than min_chars — still one retrievable chunk
+            chunks.append(current)
+        else:
+            # Short tail: merge into previous chunk if it fits, else keep as its own chunk
+            merged = (chunks[-1] + " " + current).strip()
+            if len(merged) <= max_chars:
+                chunks[-1] = merged
+            else:
+                chunks.append(current)
 
     return chunks
 

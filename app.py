@@ -43,8 +43,8 @@ def _inject_css():
         --text-dark:  #1E1B4B;
     }
 
-    /* Hide Streamlit default chrome */
-    #MainMenu, footer, header { visibility: hidden; }
+    /* Hide Streamlit default chrome (keep header for Deploy button) */
+    #MainMenu, footer { visibility: hidden; }
 
     /* ── App background ── */
     .stApp {
