@@ -8,6 +8,8 @@ Student: Najart Rauf Awuni | Index: 10022300177
 import io
 import re
 import logging
+import os
+from pathlib import Path
 import requests
 import pandas as pd
 import pypdf
@@ -22,6 +24,7 @@ PDF_URL = (
     "https://mofep.gov.gh/sites/default/files/budget-statements/"
     "2025-Budget-Statement-and-Economic-Policy_v4.pdf"
 )
+LOCAL_PDF_PATH = r"C:\Users\najar\OneDrive\Desktop\SONA-Final-Feb2025.pdf"
 
 
 # ─────────────────────────────────────────────
@@ -89,11 +92,19 @@ def load_pdf(url: str = PDF_URL) -> list[dict]:
     Download Ghana 2025 Budget PDF, extract text page-by-page via pypdf,
     clean it, return list of dicts with 'text', 'source', and 'page'.
     """
-    logger.info("Downloading PDF from %s", url)
-    response = requests.get(url, timeout=60)
-    response.raise_for_status()
+    # Priority: env override -> configured local file -> remote URL fallback.
+    pdf_path = os.getenv("SOURCE_PDF_PATH", LOCAL_PDF_PATH)
+    source_label = "2025-Budget-Statement.pdf"
+    if pdf_path and Path(pdf_path).exists():
+        logger.info("Loading PDF from local file: %s", pdf_path)
+        pdf_bytes = io.BytesIO(Path(pdf_path).read_bytes())
+        source_label = Path(pdf_path).name
+    else:
+        logger.info("Downloading PDF from %s", url)
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()
+        pdf_bytes = io.BytesIO(response.content)
 
-    pdf_bytes = io.BytesIO(response.content)
     reader = pypdf.PdfReader(pdf_bytes)
     logger.info("PDF loaded — %d pages", len(reader.pages))
 
@@ -104,7 +115,7 @@ def load_pdf(url: str = PDF_URL) -> list[dict]:
         if len(cleaned) > 50:                       # skip mostly-blank pages
             records.append({
                 "text": cleaned,
-                "source": "2025-Budget-Statement.pdf",
+                "source": source_label,
                 "page": page_num,
             })
 

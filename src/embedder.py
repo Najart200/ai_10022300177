@@ -30,7 +30,11 @@ class Embedder:
         # We don't need to call it differently — just .encode().
         self.model      = SentenceTransformer(model_name)
         self.model_name = model_name
-        self.dim        = self.model.get_sentence_embedding_dimension()
+        # sentence-transformers renamed this API; keep fallback for compatibility.
+        if hasattr(self.model, "get_embedding_dimension"):
+            self.dim = self.model.get_embedding_dimension()
+        else:
+            self.dim = self.model.get_sentence_embedding_dimension()
         logger.info("Embedding dimension: %d", self.dim)
 
     def embed_texts(self, texts: list[str],

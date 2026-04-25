@@ -1,4 +1,4 @@
-# 🐼 ACity Scholar — RAG Chatbot
+#  ACity Scholar — RAG Chatbot
 
 > **CS4241 Introduction to Artificial Intelligence — 2026**
 > Student: **Najart Rauf Awuni** | Index: **10022300177**
@@ -7,7 +7,7 @@ A fully custom Retrieval-Augmented Generation (RAG) chatbot for Academic City Un
 
 ---
 
-## 🗺️ Repository Structure
+     🗺️ Repository Structure
 
 ```
 ai_10022300177/

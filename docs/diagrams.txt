@@ -1,0 +1,117 @@
+================================================================================
+ACITY SCHOLAR — DIAGRAMS (ASCII + MERMAID-STYLE TEXT)
+================================================================================
+Student: Najart Rauf Awuni | Index: 10022300177
+
+--------------------------------------------------------------------------------
+A) END-TO-END DATA FLOW (ASCII)
+--------------------------------------------------------------------------------
+
+   +-------------+     +-------------+     +-------------+
+   |  CSV URL    |     | PDF local / |     |  (optional) |
+   |  download   |     |  remote URL |     |  feedback   |
+   +------+------+     +------+------+     +------+------+
+          |                    |                   |
+          v                    v                   |
+   +------------------------------------------------------+
+   |              data_loader.load_all_documents          |
+   +---------------------------+--------------------------+
+                               |
+                               v
+                    +--------------------+
+                    |   chunker.py       |
+                    | (sentence / fixed) |
+                    +----------+---------+
+                               |
+                               v
+                    +--------------------+
+                    |   embedder.py      |
+                    | SentenceTransformer|
+                    +----------+---------+
+                               |
+                               v
+                    +--------------------+
+                    |  vector_store.py   |
+                    | FAISS IndexFlatIP  |
+                    +----------+---------+
+                               |
+              User question    |
+                    |          |
+                    v          v
+            +-------+----------+-------+
+            |     retriever.py         |
+            | dense + sparse hybrid    |
+            +-------+----------+-------+
+                               |
+                               v
+            +-------+----------+-------+
+            |   prompt_builder.py      |
+            +-------+----------+-------+
+                               |
+                               v
+            +-------+----------+-------+
+            |     llm_client.py        |
+            |  Groq / HF / demo        |
+            +-------+----------+-------+
+                               |
+                               v
+                         [ Answer UI ]
+
+
+--------------------------------------------------------------------------------
+B) QUERY PATH (ASCII SEQUENCE)
+--------------------------------------------------------------------------------
+
+  User input
+      |
+      v
+  embed_query(question)  --->  query vector (384, float32, L2-normalised)
+      |
+      v
+  retrieve(top_k, hybrid, feedback_boosts)  --->  ranked chunk list
+      |
+      v
+  build_prompt(template, chunks, history)  --->  single prompt string
+      |
+      v
+  call_llm(prompt)  --->  model text + token stats
+      |
+      v
+  append history + write logs/feedback as configured
+
+
+--------------------------------------------------------------------------------
+C) MERMAID (COPY INTO MARKDOWN PREVIEW IF NEEDED)
+--------------------------------------------------------------------------------
+
+flowchart LR
+  subgraph Ingest
+    A[CSV download] --> D[load_all_documents]
+    B[PDF local / URL] --> D
+  end
+  D --> E[chunk_documents]
+  E --> F[Embedder.encode]
+  F --> G[FAISS + metadata save]
+  subgraph Query
+    Q[User question] --> H[embed_query]
+    H --> I[Retriever hybrid search]
+    I --> J[prompt_builder]
+    J --> K[llm_client]
+    K --> R[Response]
+  end
+  G -.-> I
+  FB[Feedback JSON] -.-> I
+
+
+--------------------------------------------------------------------------------
+D) COMPONENT DEPENDENCY (SIMPLIFIED)
+--------------------------------------------------------------------------------
+
+  app.py
+    --> pipeline.RAGPipeline
+          --> data_loader, chunker, embedder, vector_store, retriever,
+              prompt_builder, llm_client, feedback
+
+================================================================================
+END OF DIAGRAMS FILE
+================================================================================

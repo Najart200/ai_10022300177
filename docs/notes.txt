@@ -1,0 +1,66 @@
+================================================================================
+ACITY SCHOLAR — DEVELOPMENT & OPERATIONS NOTES
+================================================================================
+Student: Najart Rauf Awuni | Index: 10022300177
+
+--------------------------------------------------------------------------------
+RUNNING LOCALLY
+--------------------------------------------------------------------------------
+- Create venv; pip install -r requirements.txt
+- Set GROQ_API_KEY in ai_10022300177/.streamlit/secrets.toml or environment
+- From repo root (parent of ai_10022300177 if nested): run Streamlit pointing
+  at app.py so relative paths data/ and logs/ match vector_store defaults.
+- First run: index build can take several minutes (model + embedding).
+
+--------------------------------------------------------------------------------
+REBUILDING THE INDEX
+--------------------------------------------------------------------------------
+- UI: sidebar "Rebuild Index" clears st.cache_resource and reruns.
+- Manual: delete data/faiss.index and data/metadata.json, then restart app.
+- Changing PDF source or chunk strategy requires rebuild for full consistency.
+
+--------------------------------------------------------------------------------
+PDF SOURCE OVERRIDES
+--------------------------------------------------------------------------------
+- Environment variable SOURCE_PDF_PATH can point to any readable PDF path.
+- If unset, code may use a configured LOCAL_PDF_PATH in data_loader.py when
+  present on disk; otherwise falls back to the remote budget PDF URL.
+- For team machines or deployment, prefer SOURCE_PDF_PATH and avoid hardcoded
+  user-specific paths in shared branches.
+
+--------------------------------------------------------------------------------
+SECRETS
+--------------------------------------------------------------------------------
+- Never commit .streamlit/secrets.toml (should remain gitignored).
+- llm_client reads GROQ_API_KEY / HF_TOKEN from env or st.secrets.
+
+--------------------------------------------------------------------------------
+UI BEHAVIOUR (RECENT)
+--------------------------------------------------------------------------------
+- Retrieved chunks + full prompt expander may be hidden in app.py for a
+  cleaner chat; pipeline still computes retrieval and logs may still record
+  details under logs/.
+
+--------------------------------------------------------------------------------
+PANDA / SVG
+--------------------------------------------------------------------------------
+- Sidebar/welcome mascot may render via data-URI img to avoid Streamlit
+  sanitising raw inline SVG in markdown.
+
+--------------------------------------------------------------------------------
+TROUBLESHOOTING
+--------------------------------------------------------------------------------
+- Port 8501 in use: stop other Streamlit/Python listeners or pick another port
+  in the streamlit run command.
+- WinError 32 during pip: close apps locking site-packages or use a venv-only
+  install (recommended).
+- HF Hub 404 lines during model load are often normal optional file probes.
+
+--------------------------------------------------------------------------------
+TESTS
+--------------------------------------------------------------------------------
+- pytest tests/ from appropriate working directory so imports resolve.
+
+================================================================================
+END OF NOTES
+================================================================================

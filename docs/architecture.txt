@@ -1,0 +1,83 @@
+================================================================================
+ACITY SCHOLAR — SYSTEM ARCHITECTURE (TEXT)
+================================================================================
+Course: CS4241 AI — 2026 | Student: Najart Rauf Awuni | Index: 10022300177
+
+--------------------------------------------------------------------------------
+LAYERED VIEW
+--------------------------------------------------------------------------------
+
+[ Presentation Layer ]
+  app.py (Streamlit)
+    - Page config, CSS, sidebar controls (chunk strategy, template, top-k,
+      hybrid toggle, temperature, clear chat, rebuild index).
+    - Chat history in session_state; calls pipeline.query() on submit.
+    - Optional feedback buttons → FeedbackStore.record()
+
+[ Application / Orchestration ]
+  src/pipeline.py — RAGPipeline
+    - build_index(): load docs → chunk → embed → FAISS add → save
+    - query(): embed query → retrieve → build_prompt → call_llm → log → history
+
+[ Data Ingestion ]
+  src/data_loader.py
+    - load_csv(): HTTP GET → pandas → per-row text + source label
+    - load_pdf(): local file (priority) or HTTP GET → pypdf per page
+    - load_all_documents(): merge lists; resilient per-source try/except
+
+[ Text Segmentation ]
+  src/chunker.py
+    - chunk_documents(docs, strategy): sentence vs fixed windows + overlap
+
+[ Embedding ]
+  src/embedder.py
+    - SentenceTransformer wrapper; batch encode; normalised vectors
+
+[ Vector Storage & Search ]
+  src/vector_store.py
+    - FAISS IndexFlatIP + parallel metadata JSON
+    - save/load under data/
+
+[ Retrieval ]
+  src/retriever.py
+    - Dense: FAISS top-k on query embedding
+    - Hybrid: weighted blend with manual sparse (TF-IDF style) scoring
+    - Feedback boosts from FeedbackStore applied to ranking
+
+[ Prompting ]
+  src/prompt_builder.py
+    - Multiple templates (TEMPLATES, DEFAULT_TEMPLATE)
+    - build_prompt(): injects retrieved context + question guardrails
+
+[ Generation ]
+  src/llm_client.py
+    - call_llm(): Groq OpenAI-compatible HTTP if GROQ_API_KEY; else HF if
+      HF_TOKEN; else demo stub message
+    - Secrets: env first, then st.secrets when running under Streamlit
+
+[ Feedback & Persistence ]
+  src/feedback.py
+    - JSON-backed likes/dislikes and chunk score adjustments
+
+[ Cross-cutting ]
+  src/utils.py — logging setup, UI helpers (truncate, score colour)
+  logs/ — per-query structured logs from pipeline
+
+--------------------------------------------------------------------------------
+DEPLOYMENT / RUNTIME ASSUMPTIONS
+--------------------------------------------------------------------------------
+- Working directory for Streamlit run should be project root so data/ and
+  logs/ paths resolve consistently with vector_store.py defaults.
+- First cold start may download model weights and datasets; index build is
+  slower than subsequent loads from disk.
+
+--------------------------------------------------------------------------------
+SECURITY NOTES
+--------------------------------------------------------------------------------
+- API keys belong in .streamlit/secrets.toml (gitignored) or OS environment.
+- Do not commit secrets or personal absolute paths if the repo is public;
+  prefer SOURCE_PDF_PATH env for portable deployments.
+
+================================================================================
+END OF ARCHITECTURE TEXT
+================================================================================

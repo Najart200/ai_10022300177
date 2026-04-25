@@ -28,6 +28,22 @@ GROQ_MODEL    = "llama-3.1-8b-instant"
 HF_API_URL    = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 
 
+def _get_secret(name: str) -> str:
+    """
+    Read a secret from env vars first, then Streamlit secrets when available.
+    This keeps CLI/script usage working while supporting Streamlit deployments.
+    """
+    value = os.getenv(name, "")
+    if value:
+        return value
+
+    try:
+        import streamlit as st  # optional dependency at runtime
+        return st.secrets.get(name, "")
+    except Exception:
+        return ""
+
+
 def call_llm(prompt: str,
              temperature: float = 0.2,
              max_tokens: int = 512) -> dict:
@@ -42,8 +58,8 @@ def call_llm(prompt: str,
       'error':      str | None
     }
     """
-    api_key  = os.getenv("GROQ_API_KEY", "")
-    hf_token = os.getenv("HF_TOKEN", "")
+    api_key  = _get_secret("GROQ_API_KEY")
+    hf_token = _get_secret("HF_TOKEN")
 
     if api_key:
         return _call_groq(prompt, api_key, temperature, max_tokens)

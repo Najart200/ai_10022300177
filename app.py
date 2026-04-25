@@ -8,6 +8,7 @@ Course: CS4241 Introduction to Artificial Intelligence — 2026
 
 import streamlit as st
 from pathlib import Path
+from urllib.parse import quote
 from src.utils import setup_logging, truncate, score_colour
 from src.prompt_builder import TEMPLATES, DEFAULT_TEMPLATE
 
@@ -220,6 +221,19 @@ def _load_panda_svg() -> str:
     return ""
 
 
+def _panda_img_html(panda_svg: str, width: int = 250) -> str:
+    """Render SVG safely via data URI to avoid markdown SVG sanitisation."""
+    if not panda_svg:
+        return ""
+    encoded = quote(panda_svg)
+    return (
+        f'<div class="panda-wrap">'
+        f'<img src="data:image/svg+xml;utf8,{encoded}" '
+        f'alt="Thinking panda" width="{width}" />'
+        f'</div>'
+    )
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  PIPELINE SINGLETON  (cached across reruns)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -236,10 +250,7 @@ def _render_sidebar(panda_svg: str) -> dict:
     with st.sidebar:
         # Panda mascot
         if panda_svg:
-            st.markdown(
-                f'<div class="panda-wrap">{panda_svg}</div>',
-                unsafe_allow_html=True
-            )
+            st.markdown(_panda_img_html(panda_svg, width=230), unsafe_allow_html=True)
 
         st.markdown("---")
         st.markdown("### ⚙️ Settings")
@@ -385,7 +396,7 @@ def main():
     if not st.session_state.chat:
         st.markdown(
             '<div class="welcome-card">'
-            f'{panda_svg}'
+            f'{_panda_img_html(panda_svg, width=260)}'
             '<h2>Hello! I\'m ACity Scholar 🐼</h2>'
             '<p>I can answer questions about Ghana\'s elections and the 2025 Budget Statement '
             'using <em>only</em> the provided knowledge base — no hallucinations!</p>'
@@ -409,27 +420,6 @@ def main():
             f'<div class="bot-bubble">🐼 {turn["response"]}</div>',
             unsafe_allow_html=True
         )
-
-        # Expandable details
-        with st.expander("📂 View Retrieved Chunks + Prompt", expanded=False):
-            col_chunks, col_prompt = st.columns([1, 1])
-            with col_chunks:
-                _render_chunk_cards(turn.get("retrieved_chunks", []))
-            with col_prompt:
-                st.markdown("**📝 Exact Prompt Sent to LLM**")
-                st.markdown(
-                    f'<div class="prompt-box">{turn.get("prompt", "")}</div>',
-                    unsafe_allow_html=True
-                )
-                # Stage timings
-                st.markdown("**⏱ Stage Timings**")
-                st.markdown(
-                    f'<span class="timing-badge">Embed: {turn.get("stage1_embed_ms", 0)} ms</span>'
-                    f'<span class="timing-badge">Retrieve: {turn.get("stage2_retrieval_ms", 0)} ms</span>'
-                    f'<span class="timing-badge">Prompt: {turn.get("stage3_prompt_ms", 0)} ms</span>'
-                    f'<span class="timing-badge">LLM: {turn.get("stage4_llm_ms", 0)} ms</span>',
-                    unsafe_allow_html=True
-                )
 
         # Feedback buttons (Part G)
         fb_key_like    = f"like_{turn['idx']}"

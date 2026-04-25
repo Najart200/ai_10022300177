@@ -1,0 +1,65 @@
+================================================================================
+ACITY SCHOLAR — RAG CHATBOT — PROJECT REPORT (TEXT SUMMARY)
+================================================================================
+Course: CS4241 Introduction to Artificial Intelligence — 2026
+Student: Najart Rauf Awuni | Index: 10022300177
+
+--------------------------------------------------------------------------------
+1. PURPOSE
+--------------------------------------------------------------------------------
+ACity Scholar is a custom Retrieval-Augmented Generation (RAG) chatbot built
+without LangChain, LlamaIndex, Haystack, or similar RAG frameworks. It answers
+user questions using retrieved evidence from configured knowledge sources,
+then synthesises an answer via an LLM (Groq by default, with optional
+Hugging Face fallback).
+
+--------------------------------------------------------------------------------
+2. SCOPE AND COMPLIANCE
+--------------------------------------------------------------------------------
+- Manual implementations: chunking, embedding, FAISS storage, hybrid retrieval,
+  prompt construction, HTTP LLM client, feedback store.
+- UI: Streamlit (app.py) with themed layout.
+- Logging: per-query JSON logs under logs/ (pipeline stages).
+- Novel extension: feedback-driven retrieval adjustments (likes/dislikes).
+
+--------------------------------------------------------------------------------
+3. KNOWLEDGE BASE (CONFIGURABLE)
+--------------------------------------------------------------------------------
+- Ghana Election Results: CSV downloaded from a public GitHub dataset URL;
+  each row is cleaned and turned into embeddable text.
+- Primary PDF: loaded from a local path when the file exists (see
+  data_loader.py and SOURCE_PDF_PATH env override); otherwise the remote
+  2025 Budget Statement PDF URL is used as fallback.
+
+--------------------------------------------------------------------------------
+4. PIPELINE SUMMARY
+--------------------------------------------------------------------------------
+1) Load and clean documents (CSV + PDF pages).
+2) Chunk text (sentence-boundary or fixed-size strategy).
+3) Embed chunks with SentenceTransformer (all-MiniLM-L6-v2, 384 dims,
+   L2-normalised for cosine via inner product).
+4) Index vectors in FAISS (IndexFlatIP); persist index + metadata to data/.
+5) On query: embed question, hybrid retrieve (dense + sparse keyword score),
+   optional feedback boosts, build prompt from template, call LLM, return
+   answer and artefacts for optional UI/logging.
+
+--------------------------------------------------------------------------------
+5. EVALUATION AND RISKS (HIGH LEVEL)
+--------------------------------------------------------------------------------
+- Strengths: interpretable stack, reproducible index build, hybrid retrieval
+  improves keyword-sensitive queries vs dense-only.
+- Risks: PDF extraction quality depends on document layout; LLM answers must
+  stay grounded—prompt templates enforce context use; API keys must stay in
+  secrets/env, never in source control.
+
+--------------------------------------------------------------------------------
+6. ARTEFACTS
+--------------------------------------------------------------------------------
+- Source code: ai_10022300177/src/*.py, app.py
+- Runtime data: data/faiss.index, data/metadata.json, data/feedback.json
+- Logs: logs/query_*.json
+- Companion docs: docs/architecture.txt, docs/diagrams.txt, docs/notes.txt
+
+================================================================================
+END OF REPORT SUMMARY
+================================================================================
