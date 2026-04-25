@@ -103,7 +103,7 @@ python -m pytest tests/ -v
 
 ## 🌐 Deployment
 
-Deployed on **Streamlit Community Cloud**: *(paste your URL here)*
+Deployed on **Streamlit Community Cloud**: (https://najart200-ai-10022300177-app-6oddox.streamlit.app/)
 
 ---
 
