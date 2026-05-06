@@ -7,7 +7,7 @@ A fully custom Retrieval-Augmented Generation (RAG) chatbot for Academic City Un
 
 ---
 
-     🗺️ Repository Structure
+      Repository Structure
 
 ```
 ai_10022300177/
@@ -46,7 +46,7 @@ ai_10022300177/
 
 ---
 
-## 🧠 Knowledge Base
+##  Knowledge Base
 
 | Dataset | Format | Description |
 |---------|--------|-------------|
@@ -55,7 +55,7 @@ ai_10022300177/
 
 ---
 
-## ⚙️ How It Works
+##  How It Works
 
 ```
 Query → Embed → Hybrid Retrieve (Dense FAISS + Manual TF-IDF) →
@@ -78,7 +78,7 @@ Context Selection → Prompt (Template V3) → Groq LLM → Response
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 git clone https://github.com/Najart200/ai_10022300177.git
@@ -93,7 +93,7 @@ First run builds the FAISS index (~2–3 min). Subsequent runs load from disk (~
 
 ---
 
-## 🧪 Run Tests
+##  Run Tests
 
 ```bash
 python -m pytest tests/ -v
@@ -101,28 +101,28 @@ python -m pytest tests/ -v
 
 ---
 
-## 🌐 Deployment
+##  Deployment
 
 Deployed on **Streamlit Community Cloud**: (https://najart200-ai-10022300177-app-6oddox.streamlit.app/)
 
 ---
 
-## 📧 Submission
+##  Submission
 
 **Email subject:** `CS4241 RAG Project Submission - Najart Rauf Awuni - 10022300177`
 **Collaborator:** `GodwinDansoAcity` / `godwin.danso@acity.edu.gh`
 
 ---
 
-## 📜 Compliance
+##  Compliance
 
-- ✅ No LangChain / LlamaIndex / Haystack / any RAG framework
-- ✅ All core components manually implemented
-- ✅ Two datasets: Ghana Elections CSV + 2025 Budget PDF
-- ✅ Two chunking strategies with comparative analysis
-- ✅ Hybrid search extension (dense + manual sparse)
-- ✅ Three prompt iterations
-- ✅ Full pipeline logging (JSON per query)
-- ✅ Novel feature: feedback-driven retrieval improvement
-- ✅ Architecture diagram (Mermaid)
-- ✅ Adversarial testing templates
+-  No LangChain / LlamaIndex / Haystack / any RAG framework
+-  All core components manually implemented
+-  Two datasets: Ghana Elections CSV + 2025 Budget PDF
+-  Two chunking strategies with comparative analysis
+-  Hybrid search extension (dense + manual sparse)
+-  Three prompt iterations
+-  Full pipeline logging (JSON per query)
+-  Novel feature: feedback-driven retrieval improvement
+-  Architecture diagram (Mermaid)
+-  Adversarial testing templates
